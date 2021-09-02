@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SNIS - Santa Catarina</title>
+        <meta charset="utf-8" />
+
+	    <!-- //disables unwanted scaling of the page when on mobile devices -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+         crossorigin=""></script>
+        
+         <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+         
+     <script src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script>
+ 
+         <style>
+           #top {
+			width: 100%;
+			height: 20px;
+			float:top;
+            font: 20px Arial, Helvetica, sans-serif;
+            color: #524f4f;
+		    }
+
+            #description {
+			width: 100%;
+			height: 45px;
+            padding: 0px 20px;
+			float:top;
+            text-align: center;
+            font: 13px Arial, Helvetica, sans-serif;
+            color: #696666;
+		    }
+
+		    #map {
+			width: 55%;
+			height: 550px;
+			float:left;
+		    }
+
+            #chartDiv {
+			width: 45%;
+			height: 500px;
+			float:right;
+		    }
+
+            #titlechart{
+				font: 14px/16px Arial, Helvetica, sans-serif;
+                text-align: left;
+				background: rgba(255,255,255,0.8);
+				border-radius: 5px;
+                width: 30em;
+                margin: 6px;
+		    }
+			
+            .info {
+				padding: 6px 8px;
+				font: 14px/16px Arial, Helvetica, sans-serif;
+				background: rgba(255,255,255,0.8);
+				box-shadow: 0 0 15px rgba(0,0,0,0.2);
+				border-radius: 5px;
+				width: 10em;
+			}
+			.info h4 {
+				margin: 0 0 5px;
+				color: #777777;
+			}
+			.info #currentTown {
+             	margin: 6px 0;
+			}
+
+			.popup {
+			text-align: center;
+			}
+
+			.legend {
+			padding: 6px 8px;
+			background-color: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+			}
+
+			/* //set legend symbols (<div> elements) */
+			.legend div {
+				width: 18px;
+				height: 18px;
+				float: left; /*//ensures symbols and text descriptionsare placed together on the same line*/
+				margin-right: 8px;
+				opacity: 0.7;
+			}
+
+			/* makes sure the legend items are correctly aligned regardless of browser zoom level*/
+			div.legend.leaflet-control br {
+				clear: both;
+			}
+
+          </style>
+    </head>
+    <body>
+        <div id="top">
+            <p style = "text-align:center;"><b>Mapa interativo sobre Água e Esgoto da Região Metropolitana de Florianópolis</b></p>
+        </div>
+
+        <div id="description">
+            <p>Este mapa foi desenvolvido como Trabalho de Conclusão de Curso da especialização em Geoprocessamento da PUC Minas.<br>
+            O mapa apresenta alguns dados sobre Água e Esgoto obtidos no 
+                <a href="http://www.snis.gov.br/"  target="_blank">Sistema Nacional de Informações sobre o Saneamento - SNIS</a>.</p> 
+        </div>
+
+        <div id="map"></div>
+
+        <div id="chartDiv">
+            <div id="titlechart"></div>
+            <canvas id="myChart" height="80"></canvas>
+            <canvas id="myChart2" height="80"></canvas>
+            <canvas id="myChart3" height="80"></canvas>
+        </div>
+
+        <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+        
+        <script type="text/javascript">              
+
+        // window.onload = function() {
+        // //intialize the bar chart with nothing
+        //     newChart([], []);
+        // };
+        
+        // Chart from 'total' data
+        var newChart = function(labels, data) {
+            var ctx = document.getElementById('myChart');
+            if(window.bar != undefined) 
+            window.bar.destroy(); 
+            window.bar = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Investimento',
+                        data: data,
+                        backgroundColor: 'transparent',
+                        borderColor: 'brown',
+                        borderWidth: 2,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    legend: {display: false},
+                    title: {
+                            display: true,
+                            text:'Investimento em Sistemas de Esgoto',
+                            },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function(value, index, values){
+                                    if(parseInt(value) >= 1000){
+                                        return 'R$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                                    } else {
+                                        return 'R$' + value;
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                }
+            })
+        };
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Chart from 'in056' data
+        var newChart2 = function(labels, data2) {
+            var ctx = document.getElementById('myChart2');
+            myChart2 = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Índice',
+                        data: data2,
+                        backgroundColor: 'transparent',
+                        borderColor: 'brown',
+                        borderWidth: 2,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    legend: {display: false},
+                    title: {
+                            display: true,
+                            text:'Índice de atendimento total de esgoto',
+                            },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                min: 0,
+                                max: 100,// Your absolute max value,
+                                stepSize: 20,
+                                callback: function (value) {
+                                    return (value / this.max * 100).toFixed(0) + '%';
+                                },
+                            }
+                        }]
+                    }
+                }
+            })
+        };
+
+		// Chart from 'in046' data
+        var newChart3 = function(labels, data3) {
+            var ctx = document.getElementById('myChart3');
+            myChart3 = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Índice',
+                        data: data3,
+                        backgroundColor: 'transparent',
+                        borderColor: 'brown',
+                        borderWidth: 2,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    legend: {display: false},
+                    title: {
+                            display: true,
+                            text:'Índice de tratamento de esgoto em relação ao gerado',
+                            },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                min: 0,
+                                max: 100,// Your absolute max value,
+                                stepSize: 20,
+                                callback: function (value) {
+                                    return (value / this.max * 100).toFixed(0) + '%';
+                                },
+                            }
+                        }]
+                    }
+                }
+            })
+        };
+        
+        //create the leaflet.js map, centered on Santa Catarina
+		var map = L.map('map').setView([-27.562792677963245, -48.665332468221465], 9);
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+		}).addTo(map);
+
+        // Load geojson files from cartodb
+        let url = "https://paulamegumi.carto.com/api/v2/sql?format=GeoJSON&q=";
+        let sqlQuery = "SELECT the_geom, municipio, ano, in046i, in056i, total FROM grandefpolis";
+                        
+        let sqlQuery2 = "SELECT the_geom, municipio, prestador, sigla, servico, atendimento FROM grandefpolis2019"; 
+
+        //Information box
+		let info = L.control();
+		
+            info.onAdd = function(map) {
+                    this._div = L.DomUtil.create("div", "info");
+                    this._div.innerHTML = '<h4>Município</h4><p id="currentTown"></p>';
+                    return this._div;
+            };
+
+            info.update = function(props) {
+                const labels = []
+                const data = []
+                const data2 = []
+                const data3 = []
+                if (props) {
+                    for (const item of props) {               
+                        labels.push(item.ano)
+                        data.push(item.total)
+                        data2.push(item.in056i)
+                        data3.push(item.in046i)
+                    }
+                    console.log(labels,data)
+                    console.log(labels,data2)
+                    console.log(labels,data3)
+                    newChart(labels.reverse(), data.reverse())
+                    newChart2(labels, data2)
+                    newChart3(labels, data3);     
+                }
+            };
+
+            info.addTo(map);
+
+            //create the variable to populate the Information box
+            let info_p = document.getElementById("currentTown");
+
+            //create the variable to populate the title of all charts
+            let titlechart_p = document.getElementById("titlechart");		
+       
+        //layer style FN_TOT
+		function fn_style (feature) {
+    		return {
+				color: "white",
+				weight: 0.4,
+				fillColor: total_color(feature.properties.municipio),
+				fillOpacity: 0.4
+			};
+		}
+
+		//returning the color to each categorie of layer total
+		function total_color(p) {
+
+			if(p === "Águas Mornas" || p === "São Pedro de Alcântara" || p === "Antônio Carlos" || p === "Biguaçu" || p === "Palhoça") return "#ccebc5";
+            if(p === "São José" || p === "Santo Amaro da Imperatriz" || p === "Florianópolis") return "#b3cde3";
+            return "#fbb4ae";
+		} 
+
+		function highlightFeature(e) {
+            let layer = e.target;
+            e.target.setStyle({weight: 1.5, color: "black", fillOpacity: 0.7});
+			e.target.bringToFront();
+			info_p.innerHTML = e.target.feature.properties.municipio;
+		}
+
+		function resetHighlight(e) {
+			geojson.resetStyle(e.target);
+			info_p.innerHTML = "";
+            info.update();
+                }
+        
+        //update when click
+        function updateFeature(e){
+            const districtValues = []
+            for (var [key, value] of Object.entries(geojson._layers)) {               
+                if(value.feature.properties.municipio === e.target.feature.properties.municipio){                    
+                    districtValues.push({
+                        ano: value.feature.properties.ano,
+                        total: value.feature.properties.total,
+                        in056i: value.feature.properties.in056i,
+                        in046i: value.feature.properties.in046i,
+                    })
+                }
+            }
+            titlechart_p.innerHTML = "<b>Município selecionado: </b>"+ e.target.feature.properties.municipio;
+            info.update(districtValues)
+        }
+
+		//legend FN layer
+		var legend1 = L.control({position: "bottomleft"});
+			legend1.onAdd = function() {
+				var div = L.DomUtil.create("div", "legend"); 
+				div.innerHTML = 
+					'<b>Abrangência de Atendimento pelo prestador do serviço</b><br>'+ 
+                    '<div style="background-color: #ccebc5"></div> Local<br>' +
+                    '<div style="background-color: #b3cde3"></div> Regional<br>' +
+                    '<div style="background-color: #fbb4ae"></div> Não respondeu o SNIS<br>';
+				return div;
+			};
+		legend1.addTo(map);
+
+        function onEachFeature (feature, layer) { //applies a function on each feature when that feature is added
+			layer.addEventListener("mouseover", highlightFeature);
+			layer.addEventListener("mouseout", resetHighlight);
+            layer.on('click', updateFeature);
+        };
+
+        // Create an empty layergroup for the FN data
+        var LayerFN = L.layerGroup();
+
+		let geojson
+
+		//load data to show fn layer    
+		fetch(url + sqlQuery)
+    		.then(function(response) { //specify what to do with the response from the fetch function
+       			return response.json(); //.json is used to process JSON contents and parse it ('transformado') as object
+    		})
+    		.then(function(data) { //L.geoJSON function to convert the GeoJSON object to a Leaflet GeoJSON layer
+      			geojson = L.geoJSON(data, {
+					style:fn_style,
+					onEachFeature: onEachFeature
+                })
+                LayerFN.addLayer(geojson).addTo(map);
+                //console.log(geojson)
+            }).catch((exception) => {
+                console.log(exception)
+        });
+
+        //  // Create an empty layergroup for the POP data
+        // let LayerPOP = L.layerGroup();
+        
+        let total_info
+
+		//load data to style 'total' layer
+		fetch(url + sqlQuery2)
+    	  	.then(function(responsestyle) { //specify what to do with the response from the fetch function
+       	  		return responsestyle.json(); //.json is used to process JSON contents and parse it ('transformado') as object
+    	  	})
+    	  	.then(function(datastyle) { //L.geoJSON function to convert the GeoJSON object to a Leaflet GeoJSON layer
+                total_info = L.geoJSON(datastyle)
+                console.log(total_info)
+                //Add the L.GeoJSON instance to the empty layergroup
+                //LayerPOP.addLayer(poptotal);
+    	  });
+          
+        //  // Layer controls
+        // var layerControl = new L.Control.Layers(
+        //     {
+        //     'Esgoto': LayerFN,
+        //     'Água': LayerPOP
+        //     },
+        //     null,
+        //     {collapsed: false}
+        // ).addTo(map);
+
+        // // Add and remove legend from layers
+        // map.on('baselayerchange', function (eventLayer) {
+        // // Switch to the Investimento legend...
+        // if (eventLayer.name === 'Esgoto') {
+        //     this.removeControl(legend2);
+        //     legend1.addTo(this);
+        // } else { // Or switch to the População legend...
+        //     this.removeControl(legend1);
+        //     legend2.addTo(this);
+        // }});
+
+        </script>
+    </body>
+
+</html>
