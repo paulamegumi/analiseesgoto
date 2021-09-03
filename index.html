@@ -124,11 +124,6 @@
         <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
         
         <script type="text/javascript">              
-
-        // window.onload = function() {
-        // //intialize the bar chart with nothing
-        //     newChart([], []);
-        // };
         
         // Chart from 'total' data
         var newChart = function(labels, data) {
@@ -385,13 +380,9 @@
 					onEachFeature: onEachFeature
                 })
                 LayerFN.addLayer(geojson).addTo(map);
-                //console.log(geojson)
             }).catch((exception) => {
                 console.log(exception)
         });
-
-        //  // Create an empty layergroup for the POP data
-        // let LayerPOP = L.layerGroup();
         
         let total_info
 
@@ -403,30 +394,7 @@
     	  	.then(function(datastyle) { //L.geoJSON function to convert the GeoJSON object to a Leaflet GeoJSON layer
                 total_info = L.geoJSON(datastyle)
                 console.log(total_info)
-                //Add the L.GeoJSON instance to the empty layergroup
-                //LayerPOP.addLayer(poptotal);
     	  });
-          
-        //  // Layer controls
-        // var layerControl = new L.Control.Layers(
-        //     {
-        //     'Esgoto': LayerFN,
-        //     'Água': LayerPOP
-        //     },
-        //     null,
-        //     {collapsed: false}
-        // ).addTo(map);
-
-        // // Add and remove legend from layers
-        // map.on('baselayerchange', function (eventLayer) {
-        // // Switch to the Investimento legend...
-        // if (eventLayer.name === 'Esgoto') {
-        //     this.removeControl(legend2);
-        //     legend1.addTo(this);
-        // } else { // Or switch to the População legend...
-        //     this.removeControl(legend1);
-        //     legend2.addTo(this);
-        // }});
 
         </script>
     </body>
