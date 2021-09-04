@@ -7,6 +7,8 @@
 	    <!-- //disables unwanted scaling of the page when on mobile devices -->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+        <link rel="stylesheet" href="style.css">
+
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
         integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
         crossorigin=""/>
@@ -14,92 +16,10 @@
          integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
          crossorigin=""></script>
         
-         <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
          
-     <script src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script>
+        <script src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script>
  
-         <style>
-           #top {
-			width: 100%;
-			height: 20px;
-			float:top;
-            font: 20px Arial, Helvetica, sans-serif;
-            color: #524f4f;
-		    }
-
-            #description {
-			width: 100%;
-			height: 45px;
-            padding: 0px 20px;
-			float:top;
-            text-align: center;
-            font: 13px Arial, Helvetica, sans-serif;
-            color: #696666;
-		    }
-
-		    #map {
-			width: 55%;
-			height: 550px;
-			float:left;
-		    }
-
-            #chartDiv {
-			width: 45%;
-			height: 500px;
-			float:right;
-		    }
-
-            #titlechart{
-				font: 14px/16px Arial, Helvetica, sans-serif;
-                text-align: left;
-				background: rgba(255,255,255,0.8);
-				border-radius: 5px;
-                width: 30em;
-                margin: 6px;
-		    }
-			
-            .info {
-				padding: 6px 8px;
-				font: 14px/16px Arial, Helvetica, sans-serif;
-				background: rgba(255,255,255,0.8);
-				box-shadow: 0 0 15px rgba(0,0,0,0.2);
-				border-radius: 5px;
-				width: 10em;
-			}
-			.info h4 {
-				margin: 0 0 5px;
-				color: #777777;
-			}
-			.info #currentTown {
-             	margin: 6px 0;
-			}
-
-			.popup {
-			text-align: center;
-			}
-
-			.legend {
-			padding: 6px 8px;
-			background-color: rgba(255,255,255,0.8);
-			box-shadow: 0 0 15px rgba(0,0,0,0.2);
-			border-radius: 5px;
-			}
-
-			/* //set legend symbols (<div> elements) */
-			.legend div {
-				width: 18px;
-				height: 18px;
-				float: left; /*//ensures symbols and text descriptionsare placed together on the same line*/
-				margin-right: 8px;
-				opacity: 0.7;
-			}
-
-			/* makes sure the legend items are correctly aligned regardless of browser zoom level*/
-			div.legend.leaflet-control br {
-				clear: both;
-			}
-
-          </style>
     </head>
     <body>
         <div id="top">
@@ -110,7 +30,7 @@
             <p>Este mapa foi desenvolvido como Trabalho de Conclusão de Curso da especialização em Geoprocessamento da PUC Minas.<br>
             O mapa apresenta alguns dados sobre Esgotamento Sanitário obtidos no 
             <a href="http://www.snis.gov.br/"  target="_blank">Sistema Nacional de Informações sobre o Saneamento - SNIS</a>.<br>
-           <a href="/info.html">Mais informações o projeto e os dados apresentados.</a>
+           <a href="/analiseesgoto/info.html"></a>
             </p>
              
         </div>
