@@ -1,5 +1,5 @@
 # analiseesgoto
-Web Map com dados do SNIS sobre esgotamento sanitário para a região Metropolitana de Florianóplis.
+Web Map com dados do SNIS sobre esgotamento sanitário para a região Metropolitana de Florianópolis.
 
 Esse é meu primeiro webmap. :)
 A minha ideia era fazer um mapa somente com softwares open source, porém no final acabei colocando os dados no CartoDB.
